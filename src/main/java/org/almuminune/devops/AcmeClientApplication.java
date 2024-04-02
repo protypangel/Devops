@@ -1,7 +1,7 @@
 package org.almuminune.devops;
 
 import org.almuminune.devops.repository.AcmeAccountRepository;
-import org.almuminune.devops.service.acme.AcmeService;
+import org.almuminune.devops.service.AcmeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -22,9 +22,9 @@ public class AcmeClientApplication implements CommandLineRunner {
     AcmeAccountRepository repository;
 
     public void run(String... args) {
-//        service.CreateACertificate(
-//        //    "almuminune.org",
-//            "al-muminune.org"
-//        );
+        service.CreateACertificate(
+        //    "almuminune.org",
+            "al-muminune.org"
+        );
     }
 }

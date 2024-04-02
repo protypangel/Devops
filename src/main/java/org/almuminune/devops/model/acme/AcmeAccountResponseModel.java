@@ -4,13 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.jwk.RSAKey;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 
 import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@NoArgsConstructor
 @Getter
 public class AcmeAccountResponseModel {
     private String n, e, key;

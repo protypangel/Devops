@@ -2,32 +2,34 @@ package org.almuminune.devops.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.SneakyThrows;
+import org.almuminune.devops.controller.AcmeController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
+
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class InterceptorService implements HandlerInterceptor {
-    private int index = 0;
-    private static int min = 0;
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        index++;
-        if (index -1 < min) return true;
-        // Imprimer toutes les informations utiles de la requête
-        System.out.println("===============================================================================");
-        System.out.println("URL appelée : " + request.getRequestURI());
-        System.out.println("Méthode HTTP : " + request.getMethod());
-        System.out.println("Adresse IP du client : " + request.getRemoteAddr());
-        System.out.println("En-têtes de la requête :");
-        request.getHeaderNames().asIterator().forEachRemaining(headerName -> {
-            System.out.println(headerName + ": " + request.getHeader(headerName));
-        });
-        System.out.println("Paramètres de la requête :");
-        request.getParameterMap().forEach((paramName, paramValues) -> {
-            System.out.println(paramName + ": " + String.join(", ", paramValues));
-        });
-        System.out.println("Type de contenu : " + request.getContentType());
-        System.out.println("Adresse URL complète : " + request.getRequestURL());
-        System.out.println("===============================================================================");
-        return true;
+    AcmeService service;
+    public InterceptorService(@Autowired AcmeService acmeService) {
+        this.service = acmeService;
+    }
+
+    @SneakyThrows
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable Exception ex) {
+        if (! (handler instanceof HandlerMethod handling)) return;
+        if (!(handling.getBean() instanceof AcmeController) || !handling.getMethod().getName().equals("challenge") || response.getStatus() != 200)
+            return;
+        boolean check;
+        int sleep = 1;
+        do {
+            TimeUnit.SECONDS.sleep(sleep);
+            check = service.checkAuthorization(request.getHeader("host"));
+            sleep++;
+        } while (check && sleep < 10);
     }
 }

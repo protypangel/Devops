@@ -1,20 +1,21 @@
 package org.almuminune.devops.controller;
 
-import org.almuminune.devops.service.acme.challenge.AcmeChallenge;
+import org.almuminune.devops.service.AcmeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping(".well-known/acme-challenge/")
 public class AcmeController {
-    @Autowired AcmeChallenge challenge;
+    @Autowired AcmeService service;
     @GetMapping("{token}")
-    public String challenge (@PathVariable String token, @RequestHeader("Host") String host, @RequestHeader Map<String, String> headers) {
-        System.out.println("token = " + token + ", host = " + host);
-        String tokenFromHost = challenge.getTokenFromHost(host);
-        boolean isCorrect = tokenFromHost.equals(token);
-        return token + "." + tokenFromHost;
+    public ResponseEntity<?> challenge (
+        @PathVariable String token,
+        @RequestHeader("Host") String host
+    ) {
+        if (!service.tokens.containsKey(host)) return ResponseEntity.notFound().build();
+        if (!service.tokens.get(host).getHttp().getToken().equals(token)) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(token + "." + service.getAuthorizationAccount());
     }
 }
